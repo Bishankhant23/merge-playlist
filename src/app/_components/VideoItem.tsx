@@ -8,7 +8,7 @@ interface VideoItemSchema {
     videoId : string,
     isPlaying : boolean,
     togglePlay ?: any,
-    withButton : Boolean,
+    withButton : boolean,
     onClick ?: any
 }
 
