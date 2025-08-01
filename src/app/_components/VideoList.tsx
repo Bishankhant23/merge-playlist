@@ -18,15 +18,16 @@ interface VideoItemSchema {
 export default function VideoList({videos:initialVides}:{videos:VideoItemSchema[]}) {
     const [showPlayer , setShowPlayer] = useState(false)
     const [videos, setVideos] = useState<VideoItemSchema[]>(initialVides);
-    const [currentVideoID , setCurrentVideoId] = useState(null)
+    const [currentVideoID , setCurrentVideoId] = useState(null);
+
+    const [playVideo , setPlayVideo] = useState(true)
 
     useEffect(() => {
         setCurrentVideoId(videos[1].videoId as any)
     },[videos])
 
-    function togglePlay (id:any ) {
+    function changeVideo (id:any ) {
        setCurrentVideoId(id)
-       setShowPlayer(true)
     }
 
     const handleVideoChange = (type:string) => {
@@ -56,10 +57,14 @@ const shuffleVideos = () => {
     setCurrentVideoId((shuffled[0]?.videoId as any) ?? null);
   };
 
+  const togglePlay = () => {
+
+  }
+
     return (
       <div className="max-w-md max-h-screen  overflow-hidden  bg-gradient-to-b from-purple-900 via-purple-800 to-gray-900 m-auto min-h-screen">
         <div className={classNames(' bg-purple-950 py-4 h-screen rounded-tl-2xl rounded-tr-2xl',showPlayer ? "" : "hidden")}>
-            <VideoPlayer  onClose={() => setShowPlayer(false)} title={videos.find(e => e.videoId == currentVideoID)?.title as any} handleChange={handleVideoChange} videoId={currentVideoID as any} />
+            <VideoPlayer playVideo={playVideo} onClose={() => setShowPlayer(false)} title={videos.find(e => e.videoId == currentVideoID)?.title as any} handleChange={handleVideoChange} videoId={currentVideoID as any} />
         </div>
         
         <div style={{scrollbarWidth:"none"}} className="flex max-h-[90vh] overflow-scroll  flex-col gap-1 ">
@@ -70,11 +75,26 @@ const shuffleVideos = () => {
             {
             videos.length && videos.map(({title,thumbnail,channel,videoId,isPlaying},index) => {
                 return <div key={index} className="px-3">
-                    <VideoItem  togglePlay={togglePlay} isPlaying={videoId == currentVideoID} title={title} thumbnail={thumbnail} channel={channel} videoId={videoId} />
+                    <VideoItem onClick={changeVideo} withButton={false}  isPlaying={videoId == currentVideoID} title={title} thumbnail={thumbnail} channel={channel} videoId={videoId} />
                 </div>
             })
             }
         </div>
+
+       {
+        !showPlayer ?
+            <div onClick={() => setShowPlayer(true) } className="absolute inset-0 top-[unset] bg-purple-950">
+                <VideoItem
+                    title={videos.find(e => e.videoId == currentVideoID)?.title as any}
+                    thumbnail={videos.find(e => e.videoId == currentVideoID)?.thumbnail as any}
+                    channel={videos.find(e => e.videoId == currentVideoID)?.channel as any}
+                    videoId={videos.find(e => e.videoId == currentVideoID)?.videoId as any}
+                    withButton={true}  
+                    togglePlay={(prev:any) => setPlayVideo(!playVideo)} 
+                    isPlaying={playVideo}  />
+            </div>
+            : ""
+       }
     </div>
   );
 }

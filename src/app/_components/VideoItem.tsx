@@ -1,5 +1,5 @@
 import React from 'react'
-import { FaPlay,FaArrowLeft, FaPause } from 'react-icons/fa';
+import { FaPlay , FaPause } from 'react-icons/fa';
 
 interface VideoItemSchema {
     channel : string,
@@ -7,26 +7,33 @@ interface VideoItemSchema {
     title : string,
     videoId : string,
     isPlaying : boolean,
-    togglePlay : any
+    togglePlay ?: any,
+    withButton : Boolean,
+    onClick ?: any
 }
 
-function VideoItem({title,channel,videoId,isPlaying,thumbnail,togglePlay}:VideoItemSchema) {
-  return (
-    <div className='flex text-white rounded-md justify-between w-full items-center px-3 border border-white'>
+function VideoItem({title,channel,videoId,isPlaying,thumbnail,togglePlay,withButton,onClick}:VideoItemSchema) {
+  
+    const toggle = (e:any) => {
+        e.stopPropagation();
+        togglePlay()
+    }
+  
+    return (
+    <div onClick={() => onClick(videoId)} className='flex text-white rounded-md justify-between w-full items-center px-3 border border-white cursor-pointer'>
        <div className='flex'>
             <div className='p-2'>
                 <img className='w-20 h-20 object-cover rounded-md' src={thumbnail} alt={thumbnail} />
             </div>
             <div className='flex flex-col justify-center'>
-                <div className='text-xl font-bold whitespace-nowrap max-w-[200px] text-ellipsis overflow-hidden'>{title}</div>
+                <div className='text-xl font-bold whitespace-nowrap max-w-[150px] md:max-w-[200px] text-ellipsis overflow-hidden'>{title}</div>
                 <div className='text-sm'>{channel}</div>
             </div>
        </div>
         <div>
             {
-                !isPlaying ? <FaPlay onClick={() => togglePlay(videoId)} size={30} className='cursor-pointer'/> : <FaPause size={30}/>
+                withButton && (!isPlaying ? <FaPlay onClick={toggle} size={30} className='cursor-pointer'/> : <FaPause size={30} onClick={toggle}/>)
             }
-            
         </div>
     </div>
   )

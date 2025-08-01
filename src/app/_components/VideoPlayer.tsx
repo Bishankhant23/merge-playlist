@@ -6,12 +6,13 @@ interface videoPlayerSchema {
     videoId: string,
     handleChange:any,
     title:string,
-    onClose:any
+    onClose:any,
+    playVideo:boolean
 }
 
-export default function CustomVideoPlayer({ videoId,handleChange,title,onClose }: videoPlayerSchema) {
+export default function CustomVideoPlayer({ videoId,handleChange,title,onClose,playVideo }: videoPlayerSchema) {
   const playerRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(playVideo);
 
   const togglePlay = () => {
     setIsPlaying(!isPlaying);
