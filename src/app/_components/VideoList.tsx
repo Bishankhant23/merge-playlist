@@ -5,6 +5,8 @@ import classNames from "classnames";
 import VideoItem from "./VideoItem";
 import VideoPlayer from "./VideoPlayer";
 import { MdShuffle } from 'react-icons/md';
+import { FaBackwardStep } from "react-icons/fa6";
+import { FaArrowLeft } from "react-icons/fa";
 
 
 interface VideoItemSchema {
@@ -12,10 +14,10 @@ interface VideoItemSchema {
     thumbnail : string ,
     title : string,
     videoId : string,
-    isPlaying : boolean
+    isPlaying : boolean,
 }
 
-export default function VideoList({videos:initialVides}:{videos:VideoItemSchema[]}) {
+export default function VideoList({videos:initialVides,onclose}:{videos:VideoItemSchema[],onclose:any}) {
     const [showPlayer , setShowPlayer] = useState(false)
     const [videos, setVideos] = useState<VideoItemSchema[]>(initialVides);
     const [currentVideoID , setCurrentVideoId] = useState(null);
@@ -63,9 +65,13 @@ const shuffleVideos = () => {
         if(currentIndex <  videos.length){
             const newVideoId = videos[currentIndex + 1].videoId
             setCurrentVideoId(newVideoId as any)
+        setPlayVideo(true)
+
         }else {
             const first = videos[0].videoId
             setCurrentVideoId(first as any)
+        setPlayVideo(true)
+
         }
   }
 
@@ -76,17 +82,25 @@ const shuffleVideos = () => {
         </div>
         
         <div style={{scrollbarWidth:"none"}} className="flex max-h-[90vh] overflow-scroll  flex-col gap-1 ">
-            <div className="my-4 w-full flex justify-end px-4">
-                    <MdShuffle className="text-white cursor-pointer" onClick={() => shuffleVideos()} size={30}/>
-            </div>
-            
-            {
-            videos.length && videos.map(({title,thumbnail,channel,videoId,isPlaying},index) => {
-                return <div key={index} className="px-3">
-                    <VideoItem onClick={changeVideo} withButton={false}  isPlaying={videoId == currentVideoID} title={title} thumbnail={thumbnail} channel={channel} videoId={videoId} />
+           <div className="flex items-center px-3 absolute w-full bg-purple-900">
+                <div>
+                    <FaArrowLeft onClick={() => onclose() } size={25} className="cursor-pointer"/>
                 </div>
-            })
-            }
+                <div className="my-4 w-full flex justify-end px-4">
+                        <MdShuffle className="text-white cursor-pointer" onClick={() => shuffleVideos()} size={30}/>
+                </div>
+           </div>
+           
+            <div className="pt-17">
+                {
+                videos.length && videos.map(({title,thumbnail,channel,videoId,isPlaying},index) => {
+                    return <div key={index} className="px-3">
+                        <VideoItem onClick={changeVideo} withButton={false}  isPlaying={videoId == currentVideoID} title={title} thumbnail={thumbnail} channel={channel} videoId={videoId} />
+                    </div>
+                })
+                }
+
+            </div>
         </div>
 
        {

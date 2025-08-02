@@ -12,19 +12,28 @@ export async function POST(req: NextRequest) {
 
   for (const link of playlistLinks) {
     const playlistId = extractPlaylistId(link);
-    if (!playlistId) continue;
+    
+    if (!playlistId) {
+      return NextResponse.json({success:false,message:"please provide valid playlist links"})
+    }
+      
 
     const videos = await fetchVideosFromPlaylist(playlistId);
     videoResults.push(...videos);
   }
 const shuffledVideos = shuffleArray(videoResults);
-  return NextResponse.json({ videos: shuffledVideos });
+  return NextResponse.json({ videos: shuffledVideos,success:true });
 }
 
 function extractPlaylistId(link: string): string | null {
-  const url = new URL(link);
-  const id = url.searchParams.get("list");
-  return id;
+  try {
+    const url = new URL(link);
+    const id = url.searchParams.get("list");
+    return id;
+    
+  } catch (error) {
+    return null
+  }
 }
 
 async function fetchVideosFromPlaylist(playlistId: string) {

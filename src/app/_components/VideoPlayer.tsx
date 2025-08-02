@@ -14,7 +14,7 @@ interface videoPlayerSchema {
 
 export default function CustomVideoPlayer({ videoId,handleChange,title,onClose,playVideo,onPlayPause,onVideoEnd }: videoPlayerSchema) {
   const playerRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
 
 
   useEffect(() => {
@@ -26,14 +26,22 @@ export default function CustomVideoPlayer({ videoId,handleChange,title,onClose,p
     onPlayPause(!isPlaying)
   };
 
+  const endVideoRef:any = useRef(null)
+  const [videoEnded,setVideoEnded] = useState(false)
+  let ending = false
 
   const handlePlayerChange = (type:"play" | "pause") => {
     if(type == "play"){
       onPlayPause(true)
       setIsPlaying(true)
     }else{
-      onPlayPause(false)
-      setIsPlaying(false)
+      setTimeout(() => {
+
+        if(!ending) {
+          onPlayPause(false)
+          setIsPlaying(false)
+        }
+      })
     }
   }
 
@@ -51,9 +59,10 @@ export default function CustomVideoPlayer({ videoId,handleChange,title,onClose,p
               height='100%'
               playing={isPlaying}
               style={{ position: 'absolute', top: 0, left: 0 }}
-              onEnded={onVideoEnd}
+              onEnded={() =>  {ending=true; onVideoEnd();}}
               onPause={() => handlePlayerChange("pause")}
               onPlay={() => handlePlayerChange("play")}
+              autoPlay={true}
             />
           </div>
           

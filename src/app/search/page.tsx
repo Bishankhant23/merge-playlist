@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import VideoList from "../_components/VideoList";
-import { FaArrowLeft } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 
 interface VideoItemSchema {
   channel: string;
@@ -43,11 +43,15 @@ export default function PlaylistSearch() {
       });
 
       const data = await res.json();
-      console.log("Merged Videos:", data.videos);
-      setVideoList(data.videos);
-      setShowList(true);
+      if(data.success){
+        console.log("Merged Videos:", data.videos);
+        setVideoList(data.videos);
+        setShowList(true);
+      }else{
+        toast.error("Please provide valid playlist link")
+      }
     } catch (err) {
-      console.error("Failed to fetch videos", err);
+      
     } finally{
       setMerging(false)
     }
@@ -98,7 +102,7 @@ export default function PlaylistSearch() {
       ) : (
 
         <div className="relative max-h-[100dvh] overflow-auto" style={{scrollbarWidth:"none"}}>
-            <VideoList   videos={videoList} />
+            <VideoList onclose={() => setShowList(false)}    videos={videoList} />
         </div>
       )}
     </div>
