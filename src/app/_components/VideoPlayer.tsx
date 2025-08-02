@@ -26,6 +26,17 @@ export default function CustomVideoPlayer({ videoId,handleChange,title,onClose,p
     onPlayPause(!isPlaying)
   };
 
+
+  const handlePlayerChange = (type:"play" | "pause") => {
+    if(type == "play"){
+      onPlayPause(true)
+      setIsPlaying(true)
+    }else{
+      onPlayPause(false)
+      setIsPlaying(false)
+    }
+  }
+
   return (
     <div className="relative w-full max-w-md h-full">
       <div className=" px-4 flex flex-col justify-center gap-4  h-full overflow-hidden rounded-b-lg ">
@@ -41,6 +52,8 @@ export default function CustomVideoPlayer({ videoId,handleChange,title,onClose,p
               playing={isPlaying}
               style={{ position: 'absolute', top: 0, left: 0 }}
               onEnded={onVideoEnd}
+              onPause={() => handlePlayerChange("pause")}
+              onPlay={() => handlePlayerChange("play")}
             />
           </div>
           
