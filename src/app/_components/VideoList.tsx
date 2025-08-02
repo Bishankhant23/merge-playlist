@@ -23,11 +23,12 @@ export default function VideoList({videos:initialVides}:{videos:VideoItemSchema[
     const [playVideo , setPlayVideo] = useState(true)
 
     useEffect(() => {
-        setCurrentVideoId(videos[1].videoId as any)
+        setCurrentVideoId(videos[0].videoId as any)
     },[videos])
 
     function changeVideo (id:any ) {
-       setCurrentVideoId(id)
+       setCurrentVideoId(id);
+       setPlayVideo(true)
     }
 
     const handleVideoChange = (type:string) => {
@@ -38,7 +39,7 @@ export default function VideoList({videos:initialVides}:{videos:VideoItemSchema[
                 setCurrentVideoId(newVideoId as any)
             }
         }else {
-              const currentIndex = (videos.findIndex(e => e.videoId == currentVideoID))
+            const currentIndex = (videos.findIndex(e => e.videoId == currentVideoID))
             if(currentIndex <  videos.length){
                 const newVideoId = videos[currentIndex + 1].videoId
                 setCurrentVideoId(newVideoId as any)
@@ -57,14 +58,21 @@ const shuffleVideos = () => {
     setCurrentVideoId((shuffled[0]?.videoId as any) ?? null);
   };
 
-  const togglePlay = () => {
-
+  const handleVideoEnd = () => {
+        const currentIndex = (videos.findIndex(e => e.videoId == currentVideoID))
+        if(currentIndex <  videos.length){
+            const newVideoId = videos[currentIndex + 1].videoId
+            setCurrentVideoId(newVideoId as any)
+        }else {
+            const first = videos[0].videoId
+            setCurrentVideoId(first as any)
+        }
   }
 
     return (
-      <div className="max-w-md max-h-screen  overflow-hidden  bg-gradient-to-b from-purple-900 via-purple-800 to-gray-900 m-auto min-h-screen">
-        <div className={classNames(' bg-purple-950 py-4 h-screen rounded-tl-2xl rounded-tr-2xl',showPlayer ? "" : "hidden")}>
-            <VideoPlayer playVideo={playVideo} onClose={() => setShowPlayer(false)} title={videos.find(e => e.videoId == currentVideoID)?.title as any} handleChange={handleVideoChange} videoId={currentVideoID as any} />
+      <div className="max-w-md max-h-[100dvh]  overflow-hidden  bg-gradient-to-b from-purple-900 via-purple-800 to-gray-900 m-auto min-h-screen">
+        <div className={classNames(' bg-purple-950 py-4 h-[100dvh] rounded-tl-2xl rounded-tr-2xl',showPlayer ? "" : "hidden")}>
+            <VideoPlayer onVideoEnd={handleVideoEnd} onPlayPause={(value:any) => setPlayVideo(value)} playVideo={playVideo} onClose={() => setShowPlayer(false)} title={videos.find(e => e.videoId == currentVideoID)?.title as any} handleChange={handleVideoChange} videoId={currentVideoID as any} />
         </div>
         
         <div style={{scrollbarWidth:"none"}} className="flex max-h-[90vh] overflow-scroll  flex-col gap-1 ">

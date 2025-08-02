@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaArrowLeft, FaArrowRight, FaPause, FaPlay, FaStepBackward, FaStepForward } from "react-icons/fa";
 import ReactPlayer from "react-player";
 
@@ -7,15 +7,23 @@ interface videoPlayerSchema {
     handleChange:any,
     title:string,
     onClose:any,
-    playVideo:boolean
+    playVideo:boolean,
+    onPlayPause:any;
+    onVideoEnd : any;
 }
 
-export default function CustomVideoPlayer({ videoId,handleChange,title,onClose,playVideo }: videoPlayerSchema) {
+export default function CustomVideoPlayer({ videoId,handleChange,title,onClose,playVideo,onPlayPause,onVideoEnd }: videoPlayerSchema) {
   const playerRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(playVideo);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+
+  useEffect(() => {
+    setIsPlaying(playVideo)
+  },[playVideo])
 
   const togglePlay = () => {
     setIsPlaying(!isPlaying);
+    onPlayPause(!isPlaying)
   };
 
   return (
@@ -25,12 +33,14 @@ export default function CustomVideoPlayer({ videoId,handleChange,title,onClose,p
           
           <div style={{ borderRadius:"20px", position: 'relative', paddingTop: '56.25%', overflow: 'hidden' }}> {/* 16:9 aspect ratio */}
             <ReactPlayer
+            controls={true}
             ref={playerRef}
               src={`https://www.youtube.com/watch?v=${videoId}`}
               width='100%'
               height='100%'
               playing={isPlaying}
               style={{ position: 'absolute', top: 0, left: 0 }}
+              onEnded={onVideoEnd}
             />
           </div>
           

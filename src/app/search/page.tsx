@@ -17,6 +17,7 @@ export default function PlaylistSearch() {
   const [urls, setUrls] = useState([""]);
   const [showList, setShowList] = useState(false);
   const [videoList, setVideoList] = useState([]);
+  const [merging , setMerging] = useState(false)
 
   const handleAddField = () => {
     setUrls([...urls, ""]);
@@ -35,6 +36,7 @@ export default function PlaylistSearch() {
     });
 
     try {
+      setMerging(true)
       const res = await fetch("/api/playlist", {
         method: "POST",
         body: formData,
@@ -46,6 +48,8 @@ export default function PlaylistSearch() {
       setShowList(true);
     } catch (err) {
       console.error("Failed to fetch videos", err);
+    } finally{
+      setMerging(false)
     }
   };
 
@@ -82,17 +86,18 @@ export default function PlaylistSearch() {
               </div>
             ))}
           </div>
-
           <button
             onClick={handleSubmit}
             className="mt-6 w-full cursor-pointer bg-purple-600 hover:bg-purple-700 transition-colors text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 shadow-lg"
           >
-            MERGE
+            {
+              merging ? "MERGING..." : "MERGE"
+            }
           </button>
         </div>
       ) : (
 
-        <div className="relative max-h-screen overflow-auto" style={{scrollbarWidth:"none"}}>
+        <div className="relative max-h-[100dvh] overflow-auto" style={{scrollbarWidth:"none"}}>
             <VideoList   videos={videoList} />
         </div>
       )}
