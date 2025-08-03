@@ -89,7 +89,7 @@ const shuffleVideos = () => {
                     <FaArrowLeft onClick={() => onclose() } size={25} className="cursor-pointer"/>
                 </div>
                   {
-                        fromSaved ? <div className="md:max-w-[200px] text-center max-w-[100px] overflow-hidden text-ellipsis">{fromSaved}</div> : ""
+                        fromSaved ? <div className="md:max-w-[200px] text-center max-w-[100px] overflow-hidden text-ellipsis whitespace-nowrap">{fromSaved}</div> : ""
                   }
                 <div className="my-4  gap-3 flex justify-end px-4">
                     {
