@@ -1,13 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import classNames from "classnames";
 import VideoItem from "./VideoItem";
 import VideoPlayer from "./VideoPlayer";
 import { MdShuffle } from 'react-icons/md';
-import { FaBackwardStep } from "react-icons/fa6";
-import { FaArrowLeft } from "react-icons/fa";
-
+import { FaArrowLeft,FaSave } from "react-icons/fa";
+import SavePlaylistModal from "./models/SavePlaylistModel";
 
 interface VideoItemSchema {
     channel : string,
@@ -17,12 +16,15 @@ interface VideoItemSchema {
     isPlaying : boolean,
 }
 
-export default function VideoList({videos:initialVides,onclose}:{videos:VideoItemSchema[],onclose:any}) {
+export default function VideoList({videos:initialVides,onclose,onSave,fromSaved}:{videos:VideoItemSchema[],onclose:any,onSave:any,fromSaved:any}) {
     const [showPlayer , setShowPlayer] = useState(false)
     const [videos, setVideos] = useState<VideoItemSchema[]>(initialVides);
     const [currentVideoID , setCurrentVideoId] = useState(null);
 
     const [playVideo , setPlayVideo] = useState(true)
+
+    // model
+    const [showSavePlaylistModel,setShowSavePlaylistModel] = useState(false)
 
     useEffect(() => {
         setCurrentVideoId(videos[0].videoId as any)
@@ -82,12 +84,20 @@ const shuffleVideos = () => {
         </div>
         
         <div style={{scrollbarWidth:"none"}} className="flex max-h-[90vh] overflow-scroll  flex-col gap-1 ">
-           <div className="flex items-center px-3 absolute w-full bg-purple-900">
+           <div className="flex items-center justify-between px-3 absolute w-full bg-purple-900">
                 <div>
                     <FaArrowLeft onClick={() => onclose() } size={25} className="cursor-pointer"/>
                 </div>
-                <div className="my-4 w-full flex justify-end px-4">
-                        <MdShuffle className="text-white cursor-pointer" onClick={() => shuffleVideos()} size={30}/>
+                  {
+                        fromSaved ? <div className="md:max-w-[200px] text-center max-w-[100px] overflow-hidden text-ellipsis">{fromSaved}</div> : ""
+                  }
+                <div className="my-4  gap-3 flex justify-end px-4">
+                    {
+                        (!fromSaved) ? <FaSave size={30} className="cursor-pointer" onClick={() => setShowSavePlaylistModel(true)}/> : ""
+                    }
+                  
+                    <MdShuffle className="text-white cursor-pointer" onClick={() => shuffleVideos()} size={30}/>
+
                 </div>
            </div>
            
@@ -116,6 +126,14 @@ const shuffleVideos = () => {
                     isPlaying={playVideo}  />
             </div>
             : ""
+       }
+
+       {
+        <SavePlaylistModal
+         onClose={() => setShowSavePlaylistModel(false)}
+         show={showSavePlaylistModel}
+         onSave={onSave}
+         />
        }
     </div>
   );
