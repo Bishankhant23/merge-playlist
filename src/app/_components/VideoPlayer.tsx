@@ -44,46 +44,60 @@ export default function CustomVideoPlayer({ videoId,handleChange,title,onClose,p
 
 
   //media session integretion
-  useEffect(() => {
+  const handleChangeRef = useRef(handleChange);
+const onPlayPauseRef = useRef(onPlayPause);
+
+
+useEffect(() => {
+  handleChangeRef.current = handleChange;
+  onPlayPauseRef.current = onPlayPause;
+}, [handleChange, onPlayPause]);
+
+// Media Session setup (run once)
+useEffect(() => {
+  if ("mediaSession" in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: title,
+      artist: "YouTube",
+      album: "Custom Player",
+      artwork: [
+        {
+          src: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+          sizes: "512x512",
+          type: "image/jpeg",
+        },
+      ],
+    });
+
+    navigator.mediaSession.playbackState = isPlaying ? "playing" : "paused";
+
+    navigator.mediaSession.setActionHandler("play", () => {
+      onPlayPauseRef.current?.(true);
+    });
+
+    navigator.mediaSession.setActionHandler("pause", () => {
+      onPlayPauseRef.current?.(false);
+    });
+
+    navigator.mediaSession.setActionHandler("previoustrack", () => {
+      handleChangeRef.current?.("prev");
+    });
+
+    navigator.mediaSession.setActionHandler("nexttrack", () => {
+      handleChangeRef.current?.("next");
+    });
+  }
+
+  return () => {
     if ("mediaSession" in navigator) {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: title,
-        artist: "YouTube",
-        album: "Custom Player",
-        artwork: [
-          {
-            src: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
-            sizes: "512x512",
-            type: "image/jpeg",
-          },
-        ],
-      });
-
-      navigator.mediaSession.setActionHandler("play", () => {
-        setIsPlaying(true);
-        onPlayPause(true);
-      });
-
-      navigator.mediaSession.setActionHandler("pause", () => {
-        setIsPlaying(false);
-        onPlayPause(false);
-      });
-
-      navigator.mediaSession.setActionHandler("previoustrack", () =>
-        handleChange("prev")
-      );
-
-      navigator.mediaSession.setActionHandler("nexttrack", () =>
-        handleChange("next")
-      );
+      navigator.mediaSession.setActionHandler("play", null);
+      navigator.mediaSession.setActionHandler("pause", null);
+      navigator.mediaSession.setActionHandler("previoustrack", null);
+      navigator.mediaSession.setActionHandler("nexttrack", null);
+      navigator.mediaSession.metadata = null;
     }
-
-    return () => {
-      if ("mediaSession" in navigator) {
-        navigator.mediaSession.metadata = null;
-      }
-    };
-  }, [videoId, title, onPlayPause, handleChange]);
+  };
+}, [videoId, title]);
 
   return (
     <div className="relative w-full max-w-md h-full">
