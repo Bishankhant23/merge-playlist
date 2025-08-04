@@ -16,7 +16,6 @@ export default function CustomVideoPlayer({ videoId,handleChange,title,onClose,p
   const playerRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(true);
 
-
   useEffect(() => {
     setIsPlaying(playVideo)
   },[playVideo])
@@ -25,9 +24,7 @@ export default function CustomVideoPlayer({ videoId,handleChange,title,onClose,p
     setIsPlaying(!isPlaying);
     onPlayPause(!isPlaying)
   };
-
-  const endVideoRef:any = useRef(null)
-  const [videoEnded,setVideoEnded] = useState(false)
+ 
   let ending = false
 
   const handlePlayerChange = (type:"play" | "pause") => {
@@ -44,6 +41,49 @@ export default function CustomVideoPlayer({ videoId,handleChange,title,onClose,p
       })
     }
   }
+
+
+  //media session integretion
+  useEffect(() => {
+    if ("mediaSession" in navigator) {
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: title,
+        artist: "YouTube",
+        album: "Custom Player",
+        artwork: [
+          {
+            src: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
+            sizes: "512x512",
+            type: "image/jpeg",
+          },
+        ],
+      });
+
+      navigator.mediaSession.setActionHandler("play", () => {
+        setIsPlaying(true);
+        onPlayPause(true);
+      });
+
+      navigator.mediaSession.setActionHandler("pause", () => {
+        setIsPlaying(false);
+        onPlayPause(false);
+      });
+
+      navigator.mediaSession.setActionHandler("previoustrack", () =>
+        handleChange("prev")
+      );
+
+      navigator.mediaSession.setActionHandler("nexttrack", () =>
+        handleChange("next")
+      );
+    }
+
+    return () => {
+      if ("mediaSession" in navigator) {
+        navigator.mediaSession.metadata = null;
+      }
+    };
+  }, [videoId, title, onPlayPause, handleChange]);
 
   return (
     <div className="relative w-full max-w-md h-full">

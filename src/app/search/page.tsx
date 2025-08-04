@@ -60,7 +60,11 @@ export default function PlaylistSearch() {
         setVideoList(data.videos);
         setShowList(true);
       } else {
-        toast.error("Please provide valid playlist link");
+        if(data.statusCode == 422){
+          toast.error(data?.message);
+        }else {
+          toast.error("Please provide valid playlist link");
+        }
       }
     } catch (err) {
     } finally {
