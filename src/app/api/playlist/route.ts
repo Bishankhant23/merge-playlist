@@ -36,25 +36,66 @@ function extractPlaylistId(link: string): string | null {
   }
 }
 
+// async function fetchVideosFromPlaylist(playlistId: string) {
+//   const base = "https://www.googleapis.com/youtube/v3/playlistItems";
+//   const params = new URLSearchParams({
+//     part: "snippet",
+//     playlistId,
+//     maxResults: "50",
+//     key: YOUTUBE_API_KEY!,
+//   });
+
+//   const res = await fetch(`${base}?${params}`);
+//   const data = await res.json();
+
+//   return data.items?.map((item: any) => ({
+//     videoId: item.snippet.resourceId.videoId,
+//     title: item.snippet.title,
+//     thumbnail: item.snippet.thumbnails?.default?.url,
+//     channel: item.snippet.videoOwnerChannelTitle,
+//   })) ?? [];
+// }
+
 async function fetchVideosFromPlaylist(playlistId: string) {
   const base = "https://www.googleapis.com/youtube/v3/playlistItems";
-  const params = new URLSearchParams({
-    part: "snippet",
-    playlistId,
-    maxResults: "50",
-    key: YOUTUBE_API_KEY!,
-  });
+  const allVideos: any[] = [];
+  let nextPageToken: string | undefined = undefined;
 
-  const res = await fetch(`${base}?${params}`);
-  const data = await res.json();
+  do {
+    const params = new URLSearchParams({
+      part: "snippet",
+      playlistId,
+      maxResults: "50",
+      key: YOUTUBE_API_KEY!,
+    });
 
-  return data.items?.map((item: any) => ({
-    videoId: item.snippet.resourceId.videoId,
-    title: item.snippet.title,
-    thumbnail: item.snippet.thumbnails?.default?.url,
-    channel: item.snippet.videoOwnerChannelTitle,
-  })) ?? [];
+    if (nextPageToken) {
+      params.set("pageToken", nextPageToken);
+    }
+
+    const res = await fetch(`${base}?${params}`);
+    const data = await res.json();
+
+    if (data.error) {
+      console.error("YouTube API Error:", data.error);
+      break;
+    }
+
+    const items = data.items ?? [];
+    const videos = items.map((item: any) => ({
+      videoId: item.snippet?.resourceId?.videoId,
+      title: item.snippet?.title,
+      thumbnail: item.snippet?.thumbnails?.default?.url,
+      channel: item.snippet?.videoOwnerChannelTitle,
+    }));
+
+    allVideos.push(...videos);
+    nextPageToken = data.nextPageToken;
+  } while (nextPageToken);
+
+  return allVideos;
 }
+
 
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];

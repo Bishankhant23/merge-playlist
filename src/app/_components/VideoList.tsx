@@ -101,10 +101,10 @@ const shuffleVideos = () => {
                 </div>
            </div>
            
-            <div className="pt-17">
+            <div className="py-17">
                 {
                 videos.length && videos.map(({title,thumbnail,channel,videoId,isPlaying},index) => {
-                    return <div key={index} className="px-3">
+                    return <div key={index} className="px-3 flex">
                         <VideoItem onClick={changeVideo} withButton={false}  isPlaying={videoId == currentVideoID} title={title} thumbnail={thumbnail} channel={channel} videoId={videoId} />
                     </div>
                 })
